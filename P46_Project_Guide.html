@@ -1,0 +1,153 @@
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>P46 – Mushroom: Edible or Poisonous?</title>
+<style>body{font-family:Arial,sans-serif;max-width:860px;margin:0 auto;padding:24px 16px;color:#17132B;line-height:1.5;background:#fff}
+h1{font-size:28px;margin:4px 0}h2{font-size:20px;border-bottom:2px solid #8B5CFF;padding-bottom:4px;margin-top:28px}
+.k{color:#8B5CFF;font-weight:700;letter-spacing:.06em;font-size:13px}table{border-collapse:collapse;width:100%}td{border:1px solid #ddd;padding:6px 8px;vertical-align:top}td:first-child{font-weight:700;width:150px;background:#f6f4fd}
+.st{border:1px solid #ddd;border-radius:10px;padding:12px 14px;margin:12px 0;page-break-inside:avoid}.st h3{margin:0 0 6px;font-size:17px}.st h3 span{display:inline-block;background:#8B5CFF;color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;margin-right:8px;font-size:14px}
+pre{background:#f4f2fb;border:1px solid #ddd;border-radius:8px;padding:10px;font-size:12.5px;white-space:pre-wrap;word-break:break-word}.w{background:#fff6dc;padding:6px 10px;border-radius:6px}
+.btn{position:fixed;right:16px;bottom:16px;background:#8B5CFF;color:#fff;border:0;border-radius:999px;padding:10px 18px;font-weight:700;cursor:pointer}@media print{.btn{display:none}}</style></head><body>
+<button class="btn" onclick="window.print()">Print / Save as PDF</button>
+<div class="k">ML-I LAB PROJECT GUIDE</div><h1>P46 – Mushroom: Edible or Poisonous?</h1><p>Would you eat this mushroom? The model decides.</p>
+<table><tr><td>Student</td><td>JAYDEEP RATHOD · D51 · Div E · 24004501210361</td></tr>
+<tr><td>Problem</td><td>Classify mushrooms as edible (e) or poisonous (p) from 22 categorical features: cap shape, colour, odor, gill size, stalk, spore print colour, habitat and more.</td></tr><tr><td>Dataset</td><td><a href="https://www.kaggle.com/datasets/uciml/mushroom-classification">https://www.kaggle.com/datasets/uciml/mushroom-classification</a></td></tr>
+<tr><td>File</td><td>mushrooms.csv</td></tr><tr><td>Target (Y)</td><td>class (e / p)</td></tr><tr><td>Type</td><td>Binary classification</td></tr>
+<tr><td>Your model</td><td><b>Decision Tree</b></td></tr><tr><td>Main metric</td><td>Recall for poisonous (a mistake here is dangerous)</td></tr></table>
+<p><b>What you will build:</b> At the end you will have ONE notebook that loads mushrooms.csv, cleans it, explores it with charts, predicts "class" using Decision Tree, compares at least 4 settings in a table, and predicts 3 new inputs. Plus a short PDF report.</p>
+<h2>What you need</h2><ul><li>A laptop/computer with internet.</li><li>Google Colab (recommended) or Anaconda Jupyter Notebook.</li><li>A free Kaggle account.</li></ul>
+<h2>How to download your dataset</h2><ol><li>Open kaggle.com and click Register. Sign up with your Google account (it is free).</li><li>Open your dataset link: https://www.kaggle.com/datasets/uciml/mushroom-classification</li><li>You will see the dataset page with a list of files.</li><li>Click the 'Download' button (top right of the page). A ZIP file will be saved in your Downloads folder.</li><li>Go to Downloads, right-click the ZIP file and click 'Extract All' (Windows) to unzip it.</li><li>Inside the folder, find your file: mushrooms.csv</li><li>GOOGLE COLAB (recommended, nothing to install): open colab.research.google.com, sign in, click 'New notebook'. On the left side click the 📁 Files icon, then the Upload icon, and choose mushrooms.csv.</li><li>Colab deletes uploaded files when you close it, so upload the file again every new session. Save your notebook with File → Save a copy in Drive.</li><li>JUPYTER (Anaconda) instead: put mushrooms.csv in the SAME folder as your .ipynb notebook.</li></ol>
+<h2>Steps to perform (in order)</h2><div class="st"><h3><span>1</span>Create your notebook and load the libraries</h3><ul><li>Open Google Colab (or Jupyter) and create a new notebook.</li><li>Rename it as RollNo_P46_Name.ipynb (example: H35_P46_Riya.ipynb).</li><li>In the first cell write a heading (Markdown cell): project title, your name, roll no., enrollment no., division.</li><li>Run the code cell below. If you see 'All libraries loaded!' you are ready.</li></ul><pre>import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder, StandardScaler
+from sklearn.metrics import (confusion_matrix, ConfusionMatrixDisplay, classification_report,
+    accuracy_score, precision_score, recall_score, f1_score, roc_auc_score, RocCurveDisplay)
+from sklearn.tree import DecisionTreeClassifier, plot_tree
+import warnings; warnings.filterwarnings("ignore")
+print("All libraries loaded!")</pre><p class="w"><b>✍️ Write in your notebook:</b> Title of the project and your details.</p></div><div class="st"><h3><span>2</span>Load your dataset</h3><ul><li>Make sure the CSV file is uploaded (Colab) or in the same folder (Jupyter).</li><li>Run the code below. You should see the number of rows and columns, and the first 5 rows.</li></ul><pre>df = pd.read_csv("mushrooms.csv")
+print(df.shape)      # (rows, columns)
+df.head()</pre><p class="w"><b>✍️ Write in your notebook:</b> How many rows and columns does your dataset have? Where did it come from (Kaggle link)?</p></div><div class="st"><h3><span>3</span>Understand the data</h3><ul><li>Look at every column: what does it mean, is it a number or text?</li><li>Check missing values and the target classes.</li><li>Make a DATA DICTIONARY table: Column name | Meaning | Type (number/text) | Keep or drop.</li></ul><pre>df.info()                   # column names, types, non-null counts
+df.describe()               # min, max, mean of number columns
+print(df.isnull().sum())    # missing values in each column
+print("Duplicates:", df.duplicated().sum())</pre><p class="w"><b>✍️ Write in your notebook:</b> Data dictionary table + 2 lines about what you noticed.</p></div><div class="st"><h3><span>4</span>Prepare the target column (Y)</h3><ul><li>Your target (what the model predicts) is: class (e / p).</li><li>The target already exists in the data. Just check how many rows each class has.</li><li>If one class is much bigger than others, the data is IMBALANCED. Write this down: it affects which metric you trust.</li></ul><pre>TARGET = "class"
+print(df[TARGET].value_counts())                  # how many rows in each class
+print(df[TARGET].value_counts(normalize=True))    # same, as percentages</pre><p class="w"><b>✍️ Write in your notebook:</b> Classes of the target and their counts. Is it balanced or imbalanced?</p></div><div class="st"><h3><span>5</span>Clean the data</h3><ul><li>Remove duplicate rows.</li><li>Fill missing values: number columns with median, text columns with mode (most common value). Or drop a column if most of it is empty.</li><li>Drop ID / name columns and any column that gives away the answer (leakage).</li><li>Special note for YOUR dataset: All columns are categorical: compare label encoding vs one-hot encoding. stalk-root has '?' for missing. veil-type has a single value: drop it and explain why.</li></ul><pre>df = df.drop_duplicates()
+
+# Drop ID / name / leaking columns (write the real column names from your data)
+# df = df.drop(columns=["id_column", "name_column"])
+
+for col in df.columns:
+    if col == TARGET: continue
+    if pd.api.types.is_numeric_dtype(df[col]):
+        df[col] = df[col].fillna(df[col].median())     # number column -&gt; median
+    else:
+        df[col] = df[col].fillna(df[col].mode()[0])    # text column -&gt; most common value
+df = df.dropna(subset=[TARGET])
+
+print(df.isnull().sum().sum(), "missing values left")
+print(df.shape)</pre><p class="w"><b>✍️ Write in your notebook:</b> What you removed or filled, and WHY (one line each).</p></div><div class="st"><h3><span>6</span>Explore the data with charts (EDA)</h3><ul><li>Run the charts below. Look at each chart carefully.</li><li>Write 5 INSIGHTS in simple English. Example: 'Players with more gold at 10 minutes win more often.'</li></ul><pre>sns.countplot(x=df[TARGET]); plt.title("Class balance"); plt.show()
+
+num_cols = df.select_dtypes(include="number").columns
+df[num_cols].hist(figsize=(14, 10), bins=30); plt.tight_layout(); plt.show()
+
+# Box plot of one important numeric column by class (change the column name)
+sns.boxplot(x=df[TARGET], y=df[num_cols[0]]); plt.show()
+
+plt.figure(figsize=(12, 8))
+sns.heatmap(df[num_cols].corr(), cmap="coolwarm"); plt.title("Correlation heat map"); plt.show()</pre><p class="w"><b>✍️ Write in your notebook:</b> 5 insights from the charts (one line each).</p></div><div class="st"><h3><span>7</span>Create a new feature, encode and select features</h3><ul><li>Create at least ONE new column from existing columns (change the example line to real columns).</li><li>One-hot encoding turns text columns into 0/1 columns.</li><li>SelectKBest (filter method) keeps the most useful columns. Write down which columns were selected.</li></ul><pre># 1) NEW FEATURE: create at least one new column that makes sense for your data
+#    example: df["new_feature"] = df["column_a"] / (df["column_b"] + 1)
+#    (change the column names to real columns from YOUR dataset)
+
+# 2) Separate X (inputs) and y (target)
+X = df.drop(columns=[TARGET])
+le_y = LabelEncoder()
+y = le_y.fit_transform(df[TARGET])
+print("Classes:", list(le_y.classes_))     # class 0, class 1, ...
+
+# 3) ENCODING: turn text columns into numbers (one-hot encoding)
+X = pd.get_dummies(X, drop_first=True)
+print(X.shape)
+
+# 4) FEATURE SELECTION (filter method): keep the most useful columns
+from sklearn.feature_selection import SelectKBest, f_classif
+k = min(15, X.shape[1])
+selector = SelectKBest(f_classif, k=k).fit(X, y)
+scores = pd.Series(selector.scores_, index=X.columns).sort_values(ascending=False)
+print(scores.head(20))
+X = X[scores.head(k).index]
+feature_names = list(X.columns)
+print("Selected:", feature_names)</pre><p class="w"><b>✍️ Write in your notebook:</b> The new feature you created and why; the list of selected features.</p></div><div class="st"><h3><span>8</span>Split into train and test</h3><ul><li>80% of the data is used to TRAIN the model, 20% to TEST it.</li><li>stratify=y keeps the same class ratio in train and test.</li><li>Decision Tree does not need scaling.</li></ul><pre>X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, stratify=y, random_state=42)
+print(X_train.shape, X_test.shape)</pre><p class="w"><b>✍️ Write in your notebook:</b> Size of train and test sets.</p></div><div class="st"><h3><span>9</span>Train your model: Decision Tree</h3><ul><li>The evaluate() function below trains a model and calculates ALL metrics: accuracy, precision, recall, F1, specificity and AUC.</li><li>Run it once for the BASELINE (default settings). You will see the confusion matrix and classification report.</li><li>Use only this model in your project: Decision Tree.</li></ul><pre>results = []     # every setting you try is stored here
+
+def evaluate(name, model, show=False):
+    model.fit(X_train, y_train)
+    y_pred = model.predict(X_test)
+    cm = confusion_matrix(y_test, y_pred)
+    tn, fp, fn, tp = cm.ravel()
+    spec = tn / (tn + fp)
+    try:
+        proba = model.predict_proba(X_test)
+        auc = roc_auc_score(y_test, proba[:, 1])
+    except Exception:
+        auc = None
+    row = {"Setting": name,
+           "Accuracy": accuracy_score(y_test, y_pred),
+           "Precision": precision_score(y_test, y_pred, average="binary", zero_division=0),
+           "Recall": recall_score(y_test, y_pred, average="binary", zero_division=0),
+           "F1": f1_score(y_test, y_pred, average="binary", zero_division=0),
+           "Specificity": spec, "AUC": auc}
+    if show:
+        ConfusionMatrixDisplay(cm, display_labels=le_y.classes_).plot(cmap="Blues")
+        plt.title(name); plt.show()
+        print(classification_report(y_test, y_pred, target_names=[str(c) for c in le_y.classes_]))
+        if auc is not None:
+            RocCurveDisplay.from_predictions(y_test, proba[:, 1]); plt.title("ROC - " + name); plt.show()
+    print(row)
+    return row
+
+# BASELINE: your model with default settings
+model = DecisionTreeClassifier(random_state=42)
+results.append(evaluate("Baseline", model, show=True))</pre><p class="w"><b>✍️ Write in your notebook:</b> Baseline results. Explain the confusion matrix in words (how many correct, how many wrong).</p></div><div class="st"><h3><span>10</span>Try different settings (tuning)</h3><ul><li>Train DecisionTreeClassifier with criterion='gini' and with criterion='entropy' and compare.</li><li>Try max_depth = 2 to 10 and plot train vs test accuracy; pick the depth that does not overfit.</li><li>Visualise the final tree with plot_tree() (max_depth 3–4 for readability) and name the root-node feature.</li><li>Plot feature importances and explain the top 3.</li><li>Every setting is added to the results list automatically.</li></ul><pre># A) gini vs entropy
+for c in ["gini", "entropy"]:
+    results.append(evaluate(f"criterion={c}", DecisionTreeClassifier(criterion=c, random_state=42)))
+
+# B) max_depth: train vs test accuracy (find overfitting)
+depths = range(2, 11); tr, te = [], []
+for dpt in depths:
+    t = DecisionTreeClassifier(max_depth=dpt, random_state=42).fit(X_train, y_train)
+    tr.append(t.score(X_train, y_train)); te.append(t.score(X_test, y_test))
+plt.plot(depths, tr, marker="o", label="train"); plt.plot(depths, te, marker="o", label="test")
+plt.xlabel("max_depth"); plt.ylabel("accuracy"); plt.legend(); plt.show()
+best_depth = list(depths)[int(np.argmax(te))]
+results.append(evaluate(f"max_depth={best_depth}", DecisionTreeClassifier(max_depth=best_depth, random_state=42), show=True))
+
+# C) Draw the tree (only top levels so it is readable)
+tree = DecisionTreeClassifier(max_depth=best_depth, random_state=42).fit(X_train, y_train)
+plt.figure(figsize=(20, 8))
+plot_tree(tree, max_depth=3, feature_names=[str(f) for f in feature_names], class_names=[str(c) for c in le_y.classes_], filled=True, fontsize=8)
+plt.show()
+
+# D) Feature importance
+pd.Series(tree.feature_importances_, index=feature_names).sort_values().tail(10).plot(kind="barh"); plt.title("Feature importance"); plt.show()</pre><p class="w"><b>✍️ Write in your notebook:</b> What changed when you changed each setting? Which one was best?</p></div><div class="st"><h3><span>11</span>Compare all settings and pick your final model</h3><ul><li>The table shows every setting you tried, side by side.</li><li>Your most important metric is Recall for poisonous (a mistake here is dangerous). Choose the setting with the best Recall.</li><li>Write your best setting inside final_model = ...( ) and run it.</li></ul><pre>res = pd.DataFrame(results).round(3)
+display(res)                                    # the comparison table for your report
+
+res.set_index("Setting")[["Accuracy", "Precision", "Recall", "F1"]].plot(kind="bar", figsize=(10, 4))
+plt.title("Comparison of settings"); plt.ylim(0, 1); plt.xticks(rotation=45, ha="right"); plt.show()
+
+best = res.sort_values("Recall", ascending=False).iloc[0]
+print("Best setting by Recall:", best["Setting"])
+
+# FINAL MODEL: write the best setting here (example below), then show its full result
+final_model = DecisionTreeClassifier(random_state=42)      # &lt;- put your best setting inside ( )
+evaluate("FINAL", final_model, show=True)</pre><p class="w"><b>✍️ Write in your notebook:</b> Comparison table + bar chart + 3 lines: why you chose this final setting (talk about Recall for poisonous (a mistake here is dangerous)).</p></div><div class="st"><h3><span>12</span>Predict 3 new inputs</h3><ul><li>Make 3 new, realistic examples and let your final model predict them.</li><li>Check: does the prediction make sense? Explain in one line each.</li></ul><pre># Start from 3 real rows and change some values to make 3 NEW realistic inputs
+new = X.iloc[[0, 1, 2]].copy()
+# example: new.iloc[0, 0] = 50       &lt;- change values in your own way and explain why
+display(new)
+pred = final_model.predict(new)
+print("Predictions:", le_y.inverse_transform(pred))</pre><p class="w"><b>✍️ Write in your notebook:</b> The 3 inputs, the predictions, and whether they make sense.</p></div><div class="st"><h3><span>13</span>Write the report and prepare for viva</h3><ul><li>Run the whole notebook from top to bottom: Runtime → Restart and run all (Colab) or Kernel → Restart &amp; Run All (Jupyter). Fix any error.</li><li>Make a 4–6 page PDF report (structure is in 'What to submit').</li><li>Prepare the viva questions given below. You must be able to explain EVERY line of your code.</li></ul><p class="w"><b>✍️ Write in your notebook:</b> Conclusion: what your model can do, how good it is, and what you learned.</p></div>
+<h2>What to submit</h2><ul><li>Notebook (.ipynb) named RollNo_P46_Name.ipynb that runs top to bottom without errors.</li><li>Every step has a Markdown heading and 1–3 lines explaining the output.</li><li>Data dictionary, 5 EDA insights, comparison table, bar chart, final choice reason, 3 predictions.</li><li>PDF report (4–6 pages): 1. Title page (name, roll no., enrollment no., division, project ID + title)  2. Problem statement  3. Dataset description + data dictionary  4. Cleaning and EDA (best charts + insights)  5. Model and settings tried  6. Results: comparison table + confusion matrix + ROC  7. Conclusion and what you learned.</li><li>Viva (5 minutes): explain your project, your results and your code.</li></ul>
+<h2>Outcomes</h2><ul><li>Turn a real-world problem into a binary classification task.</li><li>Download, clean and prepare a real Kaggle dataset.</li><li>Build and tune Decision Tree in scikit-learn and explain how it decides.</li><li>Evaluate a model with confusion matrix, accuracy, precision, recall, F1, specificity, ROC and AUC.</li><li>Choose the best model setting using Recall for poisonous (a mistake here is dangerous) and defend it in a report and viva.</li></ul>
+<h2>Common mistakes to avoid</h2><ul><li>Using any model other than Decision Tree.</li><li>Keeping ID or name columns as features.</li><li>Forgetting stratify=y in the split.</li><li>Reporting only accuracy. You must show all metrics.</li><li>Copy-pasting a Kaggle notebook. In viva you must explain every line.</li><li>Not saving your work: in Colab use File → Save a copy in Drive.</li></ul>
+<h2>Viva questions</h2><ol><li>Gini vs entropy: what do they measure?</li><li>What is overfitting in a tree and how does max_depth help?</li><li>Which feature is at the root node and why?</li><li>What does feature importance mean?</li><li>What is pruning?</li><li>Why did train accuracy go up but test accuracy did not?</li><li>Why is Recall the most important metric in YOUR project?</li><li>What is precision, recall and specificity? Explain with your confusion matrix.</li><li>What does AUC = 0.5 and AUC = 1.0 mean?</li><li>Why did you use stratify=y in train_test_split?</li><li>Which columns did you drop or clean, and why?</li></ol>
+</body></html>
